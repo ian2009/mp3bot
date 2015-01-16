@@ -1,7 +1,9 @@
 package com.mp3bot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.Console;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.System.console;
@@ -27,6 +29,7 @@ public class App {
     private List<MediaInfo> medias = new ArrayList<MediaInfo>();
     private Set<String> mediaSet = new HashSet<String>();
     private CharBuffer contentBuf = CharBuffer.allocate(200 * 1024);
+    private Sink sinkObject = null;
 
     public String readFromURL(final String url) {
         String ret = "";
@@ -62,13 +65,13 @@ public class App {
         }
         reader = null;
         my = null;
-        
+
         contentBuf.flip();
         ret = contentBuf.toString().replaceAll("[\n\r]", "");
         return ret;
     }
 
-    public void parseAndyGlover(final String url, String sr) {
+    public void parseAndrewGlover(final String url, String sr) {
         int pos = 0;
         int endPos = 0;
         int startIndex = 0;
@@ -144,7 +147,7 @@ public class App {
         }
     }
 
-    public void scanAndyGlover() {
+    public void scanAndrewGlover() {
         List<String> urls = new ArrayList<String>(10);
         Collections.addAll(urls,
                 "http://www.ibm.com/developerworks/library/j-gloverpodcast/", //Season1
@@ -157,7 +160,7 @@ public class App {
         for (String m : urls) {
             System.out.println("[INFO] Try to read from [" + m + "]");
             String str = this.readFromURL(m);
-            parseAndyGlover(m, str);
+            parseAndrewGlover(m, str);
         }
     }
 
@@ -204,7 +207,7 @@ public class App {
     public void scanChangeLogIndex() {
         final String url = "http://thechangelog.com/podcast/";
         this.contentBuf.clear();
-        
+
         String sr = readFromURL(url);
 
         final String flag = "class=\"post-content\"";
@@ -257,14 +260,32 @@ public class App {
         return medias;
     }
 
+    public Sink getSinkObject() {
+        return sinkObject;
+    }
+
+    public void setSinkObject(Sink sinkObject) {
+        this.sinkObject = sinkObject;
+    }
+
+    public boolean sink() {
+        if (this.sinkObject != null) {
+            return this.sinkObject.handle(this.medias);
+        } else {
+            return false;
+        }
+    }
+    
     public static void main(String[] args) {
         int i = 0;
         App app = new App();
-        app.scanAndyGlover();
+        app.scanAndrewGlover();
         app.scanChangeLogIndex();
         for (MediaInfo media : app.getMedias()) {
             System.out.println(String.format("%d: [%s] -> [%s]", i, media.getTitle(), media.getUrl()));
             ++i;
         }
+        app.setSinkObject(new JsonSink());
+        app.sink();
     }
 }
