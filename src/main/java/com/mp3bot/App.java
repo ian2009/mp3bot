@@ -285,7 +285,10 @@ public class App {
             System.out.println(String.format("%d: [%s] -> [%s]", i, media.getTitle(), media.getUrl()));
             ++i;
         }
-        app.setSinkObject(new JsonSink());
+        //app.setSinkObject(new JsonSink());
+        SqliteSink obj = new SqliteSink();
+        obj.setDbName("test.dat");
+        app.setSinkObject(obj);
         app.sink();
     }
 }
