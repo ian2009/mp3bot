@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.mp3bot;
 
 import java.util.List;
@@ -23,6 +24,10 @@ import java.util.List;
  *
  * @author Ian Feng
  */
-public interface Sink {
-    boolean handle(final List<MediaInfo> medias);
+public class MySQLSink implements Sink{
+
+    public boolean handle(List<MediaInfo> medias) {
+        return false;
+    }
+    
 }
